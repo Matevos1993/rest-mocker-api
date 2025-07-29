@@ -1,5 +1,6 @@
-package restmocker.backend.domain.dto;
+package restmocker.backend.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +8,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class Todo {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class TodoDto {
 
   private long id;
   private String todo;

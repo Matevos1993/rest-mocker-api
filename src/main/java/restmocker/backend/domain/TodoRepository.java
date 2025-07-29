@@ -8,11 +8,11 @@ public interface TodoRepository {
 
   List<Todo> getTodos();
 
-  Todo getTodo(int id);
+  Todo getTodo(long id);
 
   Todo createTodo(Todo todo);
 
-  void updateTodo(int id, Todo todo);
+  void updateTodo(long id, Todo todo);
 
   void deleteTodos(List<Long> ids);
 }

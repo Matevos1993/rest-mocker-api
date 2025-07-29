@@ -15,7 +15,7 @@ public class Todo {
   @Id
   @Column(name = "id", nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private long id;
 
   @Column(name = "todo")
   private String todo;
@@ -23,8 +23,8 @@ public class Todo {
   @Column(name = "completed")
   private Boolean completed;
 
-  @Column(name = "userId")
-  private Long userId;
+  @Column(name = "userid")
+  private long userId;
 
   @Column(name = "created_at")
   private Date createdAt;
