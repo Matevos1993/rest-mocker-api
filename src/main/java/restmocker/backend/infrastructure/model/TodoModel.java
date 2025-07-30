@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "todos")
-public class Todo {
+public class TodoModel {
 
   @Id
   @Column(name = "id", nullable = false)

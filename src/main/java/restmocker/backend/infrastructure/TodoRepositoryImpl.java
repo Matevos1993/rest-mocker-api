@@ -6,8 +6,10 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import restmocker.backend.domain.TodoRepository;
+import restmocker.backend.domain.dto.PaginatedTodos;
 import restmocker.backend.domain.dto.Todo;
 import restmocker.backend.infrastructure.mapper.TodoMapper;
+import restmocker.backend.infrastructure.model.TodoModel;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TodoRepositoryImpl extends AbstractRepository implements TodoRepository {
 
   private final TodoMapper mapper;
-  private final List<restmocker.backend.infrastructure.model.Todo> todos = new CopyOnWriteArrayList<>();
+  private final List<TodoModel> todos = new CopyOnWriteArrayList<>();
   private int nextId;
 
   @Inject
@@ -35,27 +37,35 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
   }
 
   @Override
-  public List<Todo> getTodos(int offset, int limit, String sort, String order) {
+  public PaginatedTodos getPaginatedTodos(int offset, int limit, String sort, String order) {
 
     loadTodosIfEmpty();
 
-    List<restmocker.backend.infrastructure.model.Todo> sortedTodos = new ArrayList<>(todos);
+    int totalCount = todos.size();
+
+    List<TodoModel> sortedTodos = new ArrayList<>(todos);
 
     sortList(sort, order, sortedTodos);
 
-    if (offset >= sortedTodos.size()) {
-      return new ArrayList<>();
-    }
+    if (offset >= sortedTodos.size()) offset = (totalCount - (totalCount % limit)) + 1;
 
-    List<restmocker.backend.infrastructure.model.Todo> paginatedTodos = sortedTodos.subList(offset, Math.min(offset + limit, sortedTodos.size()));
+    List<TodoModel> paginatedTodos = sortedTodos.subList(offset, Math.min(offset + limit, sortedTodos.size()));
 
-    return mapper.mapToTodos(paginatedTodos);
+    return mapper.mapToPaginatedTodos(paginatedTodos, totalCount, offset, limit, sort, order);
+  }
+
+  @Override
+  public List<Todo> getTodos() {
+
+    loadTodosIfEmpty();
+
+    return mapper.mapToTodos(todos);
   }
 
   @Override
   public Todo getTodo(long id) {
 
-    restmocker.backend.infrastructure.model.Todo todo = findTodoById(id);
+    TodoModel todo = findTodoById(id);
 
     if (todo == null) throw new NotFoundException("Todo with id " + id + " does not exist");
 
@@ -83,7 +93,7 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
   @Transactional
   public Todo updateTodo(long id, Todo todo) {
 
-    restmocker.backend.infrastructure.model.Todo t = findTodoById(id);
+    TodoModel t = findTodoById(id);
 
     if (t == null) throw new NotFoundException("Todo with id " + id + " does not exist");
 
@@ -98,13 +108,13 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
   public void deleteTodos(List<Long> ids) {
 
     for (Long id : ids) {
-      restmocker.backend.infrastructure.model.Todo todo = findTodoById(id);
+      TodoModel todo = findTodoById(id);
 
       todos.remove(todo);
     }
   }
 
-  private restmocker.backend.infrastructure.model.Todo findTodoById(long id) {
+  private TodoModel findTodoById(long id) {
 
     if (todos.isEmpty()) loadTodosIfEmpty();
 
@@ -118,25 +128,24 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
 
     if (todos.isEmpty()) todos.addAll(entityManager.createQuery("""
             select todo
-              from Todo todo
-            """, restmocker.backend.infrastructure.model.Todo.class)
+              from TodoModel todo
+            """, TodoModel.class)
         .getResultList());
 
     nextId = todos.size();
   }
 
-  private static void sortList(String sort, String order, List<restmocker.backend.infrastructure.model.Todo> sortedTodos) {
-    Comparator<restmocker.backend.infrastructure.model.Todo> comparator = switch (sort.toLowerCase()) {
-      case "todo" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getTodo);
-      case "completed" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCompleted);
-      case "createdat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCreatedAt);
-      case "updatedat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getUpdatedAt);
-      default -> Comparator.comparingLong(restmocker.backend.infrastructure.model.Todo::getId);
+  private static void sortList(String sort, String order, List<TodoModel> sortedTodos) {
+
+    Comparator<TodoModel> comparator = switch (sort.toLowerCase()) {
+      case "todo" -> Comparator.comparing(TodoModel::getTodo);
+      case "completed" -> Comparator.comparing(TodoModel::getCompleted);
+      case "createdat" -> Comparator.comparing(TodoModel::getCreatedAt);
+      case "updatedat" -> Comparator.comparing(TodoModel::getUpdatedAt);
+      default -> Comparator.comparingLong(TodoModel::getId);
     };
 
-    if ("desc".equalsIgnoreCase(order)) {
-      comparator = comparator.reversed();
-    }
+    if ("desc".equalsIgnoreCase(order)) comparator = comparator.reversed();
 
     sortedTodos.sort(comparator);
   }

@@ -1,7 +1,9 @@
 package restmocker.backend.application;
 
 import org.mapstruct.Mapper;
+import restmocker.backend.application.dto.PaginatedTodosDto;
 import restmocker.backend.application.dto.TodoDto;
+import restmocker.backend.domain.dto.PaginatedTodos;
 import restmocker.backend.domain.dto.Todo;
 
 import java.util.List;
@@ -14,4 +16,6 @@ public interface TodoMapper {
   List<TodoDto> mapToTodoDtos(List<Todo> todos);
 
   Todo mapToTodo(TodoDto todoDto);
+
+  PaginatedTodosDto mapToPaginatedTodosDto(PaginatedTodos paginatedTodos);
 }

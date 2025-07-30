@@ -2,6 +2,7 @@ package restmocker.backend.application;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import restmocker.backend.application.dto.PaginatedTodosDto;
 import restmocker.backend.application.dto.TodoDto;
 import restmocker.backend.domain.TodoRepository;
 
@@ -21,10 +22,10 @@ public class TodoResource {
   }
 
   @GET
-  public List<TodoDto> getTodos(@QueryParam("offset") @DefaultValue("0") int offset,
-                                @QueryParam("limit") @DefaultValue("100") int limit,
-                                @QueryParam("sort") @DefaultValue("id") String sort,
-                                @QueryParam("order") @DefaultValue("asc") String order) {
+  public PaginatedTodosDto getTodos(@QueryParam("offset") @DefaultValue("0") int offset,
+                                    @QueryParam("limit") @DefaultValue("100") int limit,
+                                    @QueryParam("sort") @DefaultValue("id") String sort,
+                                    @QueryParam("order") @DefaultValue("asc") String order) {
 
     if (offset < 0 || limit <= 0) {
       offset = 0;
@@ -39,7 +40,13 @@ public class TodoResource {
       order = "asc";
     }
 
-    return todoMapper.mapToTodoDtos(todoRepository.getTodos(offset, limit, sort, order));
+    return todoMapper.mapToPaginatedTodosDto(todoRepository.getPaginatedTodos(offset, limit, sort, order));
+  }
+
+  @GET
+  public List<TodoDto> getTodos() {
+
+    return todoMapper.mapToTodoDtos(todoRepository.getTodos());
   }
 
   @GET

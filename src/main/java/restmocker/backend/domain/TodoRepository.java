@@ -1,12 +1,15 @@
 package restmocker.backend.domain;
 
+import restmocker.backend.domain.dto.PaginatedTodos;
 import restmocker.backend.domain.dto.Todo;
 
 import java.util.List;
 
 public interface TodoRepository {
 
-  List<Todo> getTodos(int offset, int limit, String sort, String order);
+  PaginatedTodos getPaginatedTodos(int offset, int limit, String sort, String order);
+
+  List<Todo> getTodos();
 
   Todo getTodo(long id);
 
