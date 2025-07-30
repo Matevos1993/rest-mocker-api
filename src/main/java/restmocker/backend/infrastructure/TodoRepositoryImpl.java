@@ -34,6 +34,7 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
     nextId = 0;
   }
 
+  @Override
   public List<Todo> getTodos(int offset, int limit, String sort, String order) {
 
     loadTodosIfEmpty();
@@ -49,22 +50,6 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
     List<restmocker.backend.infrastructure.model.Todo> paginatedTodos = sortedTodos.subList(offset, Math.min(offset + limit, sortedTodos.size()));
 
     return mapper.mapToTodos(paginatedTodos);
-  }
-
-  private static void sortList(String sort, String order, List<restmocker.backend.infrastructure.model.Todo> sortedTodos) {
-    Comparator<restmocker.backend.infrastructure.model.Todo> comparator = switch (sort.toLowerCase()) {
-      case "todo" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getTodo);
-      case "completed" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCompleted);
-      case "createdat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCreatedAt);
-      case "updatedat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getUpdatedAt);
-      default -> Comparator.comparingLong(restmocker.backend.infrastructure.model.Todo::getId);
-    };
-
-    if ("desc".equalsIgnoreCase(order)) {
-      comparator = comparator.reversed();
-    }
-
-    sortedTodos.sort(comparator);
   }
 
   @Override
@@ -138,5 +123,21 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
         .getResultList());
 
     nextId = todos.size();
+  }
+
+  private static void sortList(String sort, String order, List<restmocker.backend.infrastructure.model.Todo> sortedTodos) {
+    Comparator<restmocker.backend.infrastructure.model.Todo> comparator = switch (sort.toLowerCase()) {
+      case "todo" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getTodo);
+      case "completed" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCompleted);
+      case "createdat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getCreatedAt);
+      case "updatedat" -> Comparator.comparing(restmocker.backend.infrastructure.model.Todo::getUpdatedAt);
+      default -> Comparator.comparingLong(restmocker.backend.infrastructure.model.Todo::getId);
+    };
+
+    if ("desc".equalsIgnoreCase(order)) {
+      comparator = comparator.reversed();
+    }
+
+    sortedTodos.sort(comparator);
   }
 }
