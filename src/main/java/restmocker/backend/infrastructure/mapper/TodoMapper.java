@@ -10,4 +10,6 @@ public interface TodoMapper {
   Todo mapToTodo(restmocker.backend.infrastructure.model.Todo todo);
 
   List<Todo> mapToTodos(List<restmocker.backend.infrastructure.model.Todo> todos);
+
+  restmocker.backend.infrastructure.model.Todo mapToModel(Todo todo);
 }

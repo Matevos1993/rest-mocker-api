@@ -1,78 +1,48 @@
-# code-with-quarkus
+# Rest Mocker API
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+**Rest Mocker API** is an open-source service designed to simulate RESTful APIs for frontend development, integration testing, and learning purposes. It provides easily configurable endpoints and realistic mock data, helping developers prototype or test client applications without relying on live backends.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+This project is built with **[Quarkus](https://quarkus.io/)** – the Supersonic Subatomic Java Framework – to provide fast startup times and developer-friendly features.
 
-## Running the application in dev mode
+---
 
-You can run your application in dev mode that enables live coding using:
+## 🚀 Features
 
-```shell script
-./gradlew quarkusDev
+- ✅ Mock common REST endpoints (GET, POST, PUT, DELETE)
+- 📄 Simulate different response payloads and status codes
+- ⏱️ Add artificial latency for realistic network simulation
+- 🔐 Optional request validation or authentication simulation
+- 📦 Easily extendable with your own endpoints
+- 🌱 Quarkus Dev Mode with hot reload
+- 🧪 Great for frontend development, testing, or educational use
+
+---
+
+## 📦 API Overview
+
+The API currently supports the following mock resource types:
+> ⚠️ **Warning:**  
+> Rest Mocker API simulates REST requests and responses. Default data is loaded from the database, while user changes are stored only in memory and are reset after 30 minutes. No actual data is permanently saved, updated, or deleted. All changes are ephemeral and exist only for the duration of the retention period.
+### TODO Items
+
+| Endpoint                                              | Method | Description                                                 |
+|-------------------------------------------------------|--------|-------------------------------------------------------------|
+| `/todos`                                              | GET    | Fetch list of mocked TODO items                             |
+| `/todos?offset=10&limit=20&sort=createdAt&order=desc` | GET    | Fetch list of mocked TODO items with pagination and sorting |
+| `/todos/{id}`                                         | GET    | Fetch a single TODO item by ID                              |
+| `/todos`                                              | POST   | Add a new mock TODO item                                    |
+| `/todos/{id}`                                         | PUT    | Update a mock TODO item                                     |
+| `/todos?id={id}`                                      | DELETE | Delete a mock TODO item                                     |
+
+### Example `TODO` JSON
+
+```json
+{
+  "id": 1,
+  "todo": "Create README",
+  "completed": true,
+  "userId": 1,
+  "createdAt": "2025-30-07T12:00:00Z",
+  "updatedAt": null
+}
 ```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./gradlew build
-```
-
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./gradlew build -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./gradlew build -Dquarkus.native.enabled=true
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./build/code-with-quarkus-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/gradle-tooling>.
-
-## Related Guides
-
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)

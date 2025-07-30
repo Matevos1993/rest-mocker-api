@@ -21,9 +21,25 @@ public class TodoResource {
   }
 
   @GET
-  public List<TodoDto> getTodos() {
+  public List<TodoDto> getTodos(@QueryParam("offset") @DefaultValue("0") int offset,
+                                @QueryParam("limit") @DefaultValue("100") int limit,
+                                @QueryParam("sort") @DefaultValue("id") String sort,
+                                @QueryParam("order") @DefaultValue("asc") String order) {
 
-    return todoMapper.mapToTodoDtos(todoRepository.getTodos());
+    if (offset < 0 || limit <= 0) {
+      offset = 0;
+      limit = 100;
+    }
+
+    if (!List.of("id", "todo", "completed", "createdAt", "updatedAt").contains(sort.toLowerCase())) {
+      sort = "id";
+    }
+
+    if (!List.of("asc", "desc").contains(order.toLowerCase())) {
+      order = "asc";
+    }
+
+    return todoMapper.mapToTodoDtos(todoRepository.getTodos(offset, limit, sort, order));
   }
 
   @GET
@@ -41,13 +57,13 @@ public class TodoResource {
 
   @PUT
   @Path("/{id}")
-  public void updateTodo(@PathParam("id") Long id, TodoDto todoDto) {
+  public TodoDto updateTodo(@PathParam("id") Long id, TodoDto todoDto) {
 
-    todoRepository.updateTodo(id, todoMapper.mapToTodo(todoDto));
+    return todoMapper.mapToTodoDto(todoRepository.updateTodo(id, todoMapper.mapToTodo(todoDto)));
   }
 
   @DELETE
-  public void deleteTodos(@QueryParam("ids") List<Long> ids) {
+  public void deleteTodos(@QueryParam("id") List<Long> ids) {
 
     todoRepository.deleteTodos(ids);
   }
