@@ -15,17 +15,16 @@ public interface TodoMapper {
 
   TodoModel mapToModel(Todo todo);
 
-  default PaginatedTodos mapToPaginatedTodos(List<TodoModel> todos, int totalCount, int offset, int limit, String sort, String order) {
+  default PaginatedTodos mapToPaginatedTodos(List<TodoModel> todos, int totalCount, int page, int limit, String sort, String order) {
 
     PaginatedTodos paginatedTodos = new PaginatedTodos();
     paginatedTodos.setTodos(mapToTodos(todos));
     paginatedTodos.setTotalCount(totalCount);
-    paginatedTodos.setOffset(offset);
     paginatedTodos.setLimit(limit);
     paginatedTodos.setSort(sort);
     paginatedTodos.setOrder(order);
     paginatedTodos.setTotalPages((int) Math.ceil((double) totalCount / limit));
-    paginatedTodos.setCurrentPage((offset / limit) + 1);
+    paginatedTodos.setCurrentPage(page);
     return paginatedTodos;
   }
 }

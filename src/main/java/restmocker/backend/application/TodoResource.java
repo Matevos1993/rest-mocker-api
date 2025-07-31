@@ -22,28 +22,24 @@ public class TodoResource {
   }
 
   @GET
-  public PaginatedTodosDto getTodos(@QueryParam("offset") @DefaultValue("0") int offset,
+  public PaginatedTodosDto getTodos(@QueryParam("page") @DefaultValue("1") int page,
                                     @QueryParam("limit") @DefaultValue("100") int limit,
                                     @QueryParam("sort") @DefaultValue("id") String sort,
                                     @QueryParam("order") @DefaultValue("asc") String order) {
 
-    if (offset < 0 || limit <= 0) {
-      offset = 0;
-      limit = 100;
-    }
+    page = Math.max(1, page);
 
-    if (!List.of("id", "todo", "completed", "createdAt", "updatedAt").contains(sort.toLowerCase())) {
-      sort = "id";
-    }
+    limit = Math.max(1, limit);
 
-    if (!List.of("asc", "desc").contains(order.toLowerCase())) {
-      order = "asc";
-    }
+    if (!List.of("id", "todo", "completed", "createdAt", "updatedAt").contains(sort.toLowerCase())) sort = "id";
 
-    return todoMapper.mapToPaginatedTodosDto(todoRepository.getPaginatedTodos(offset, limit, sort, order));
+    if (!List.of("asc", "desc").contains(order.toLowerCase())) order = "asc";
+
+    return todoMapper.mapToPaginatedTodosDto(todoRepository.getPaginatedTodos(page, limit, sort, order));
   }
 
   @GET
+  @Path("/all")
   public List<TodoDto> getTodos() {
 
     return todoMapper.mapToTodoDtos(todoRepository.getTodos());

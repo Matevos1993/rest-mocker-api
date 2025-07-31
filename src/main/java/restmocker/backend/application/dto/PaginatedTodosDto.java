@@ -11,7 +11,6 @@ public class PaginatedTodosDto {
 
   private List<TodoDto> todos;
   private int totalCount;
-  private int offset;
   private int limit;
   private String sort;
   private String order;

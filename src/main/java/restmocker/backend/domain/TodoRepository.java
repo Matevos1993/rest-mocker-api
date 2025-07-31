@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TodoRepository {
 
-  PaginatedTodos getPaginatedTodos(int offset, int limit, String sort, String order);
+  PaginatedTodos getPaginatedTodos(int page, int limit, String sort, String order);
 
   List<Todo> getTodos();
 

@@ -37,21 +37,27 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
   }
 
   @Override
-  public PaginatedTodos getPaginatedTodos(int offset, int limit, String sort, String order) {
-
+  public PaginatedTodos getPaginatedTodos(int page, int limit, String sort, String order) {
     loadTodosIfEmpty();
 
     int totalCount = todos.size();
+
+    if (totalCount == 0) return mapper.mapToPaginatedTodos(new ArrayList<>(), 0, page, limit, sort, order);
 
     List<TodoModel> sortedTodos = new ArrayList<>(todos);
 
     sortList(sort, order, sortedTodos);
 
-    if (offset >= sortedTodos.size()) offset = (totalCount - (totalCount % limit)) + 1;
+    if (totalCount <= limit) page = 1;
 
-    List<TodoModel> paginatedTodos = sortedTodos.subList(offset, Math.min(offset + limit, sortedTodos.size()));
+    int fromIndex = (page - 1) * limit;
+    int toIndex = fromIndex + limit > totalCount ? totalCount : fromIndex + limit;
 
-    return mapper.mapToPaginatedTodos(paginatedTodos, totalCount, offset, limit, sort, order);
+    List<TodoModel> paginatedTodos = (fromIndex >= toIndex)
+        ? new ArrayList<>()
+        : sortedTodos.subList(fromIndex, toIndex);
+
+    return mapper.mapToPaginatedTodos(paginatedTodos, totalCount, page, limit, sort, order);
   }
 
   @Override
