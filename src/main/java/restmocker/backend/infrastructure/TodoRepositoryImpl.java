@@ -51,7 +51,7 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
     if (totalCount <= limit) page = 1;
 
     int fromIndex = (page - 1) * limit;
-    int toIndex = fromIndex + limit > totalCount ? totalCount : fromIndex + limit;
+    int toIndex = Math.min(fromIndex + limit, totalCount);
 
     List<TodoModel> paginatedTodos = (fromIndex >= toIndex)
         ? new ArrayList<>()

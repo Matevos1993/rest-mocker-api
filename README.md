@@ -46,3 +46,56 @@ The API currently supports the following mock resource types:
   "updatedAt": null
 }
 ```
+### Example `PaginatedTODO` JSON
+
+```json
+[
+  {
+    "todos": [
+      {
+        "id": 1,
+        "todo": "Create README",
+        "completed": true,
+        "userId": 1,
+        "createdAt": "2025-30-07T12:00:00Z",
+        "updatedAt": null
+      },
+      {
+        "id": 2,
+        "todo": "Implement API endpoints",
+        "completed": false,
+        "userId": 1,
+        "createdAt": "2025-30-07T12:05:00Z",
+        "updatedAt": null
+      }
+    ],
+    "totalCount": 22,
+    "limit": 10,
+    "sort": "id",
+    "order": "asc",
+    "totalPages": 1,
+    "currentPage": 1
+  }
+]
+```
+### Example `CreateTODO` JSON body
+
+> `completed` and `userId` are optional. Defaults: `completed = false`, `userId = 1`
+
+```json
+{
+  "todo": "Create README",
+  "completed": false,
+  "userId": 1
+}
+```
+### Example `UpdateTODO` JSON body
+
+> `completed` and `userId` are optional. Defaults: `completed = false`, `userId = 1`
+
+```json
+{
+  "todo": "Update README",
+  "completed": true
+}
+```
