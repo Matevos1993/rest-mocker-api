@@ -25,6 +25,7 @@ public interface TodoMapper {
     paginatedTodos.setOrder(order);
     paginatedTodos.setTotalPages((int) Math.ceil((double) totalCount / limit));
     paginatedTodos.setCurrentPage(page);
+
     return paginatedTodos;
   }
 }

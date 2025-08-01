@@ -20,9 +20,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ApplicationScoped
 public class TodoRepositoryImpl extends AbstractRepository implements TodoRepository {
 
+  private int nextId;
   private final TodoMapper mapper;
   private final List<TodoModel> todos = new CopyOnWriteArrayList<>();
-  private int nextId;
 
   @Inject
   public TodoRepositoryImpl(TodoMapper mapper) {
@@ -38,14 +38,13 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
 
   @Override
   public PaginatedTodos getPaginatedTodos(int page, int limit, String sort, String order) {
-    loadTodosIfEmpty();
 
+    loadTodosIfEmpty();
     int totalCount = todos.size();
 
     if (totalCount == 0) return mapper.mapToPaginatedTodos(new ArrayList<>(), 0, page, limit, sort, order);
 
     List<TodoModel> sortedTodos = new ArrayList<>(todos);
-
     sortList(sort, order, sortedTodos);
 
     if (totalCount <= limit) page = 1;
@@ -115,7 +114,6 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
 
     for (Long id : ids) {
       TodoModel todo = findTodoById(id);
-
       todos.remove(todo);
     }
   }

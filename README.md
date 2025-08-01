@@ -46,7 +46,8 @@ The API currently supports the following mock resource types:
   "updatedAt": null
 }
 ```
-### Example `PaginatedTODO` JSON
+### Example `Paginated TODO` JSON
+> `queryparams` are optional. By default `limit == 100`,`page == 1`,`sort == id`,`order == asc`
 
 ```json
 [
@@ -78,7 +79,7 @@ The API currently supports the following mock resource types:
   }
 ]
 ```
-### Example `CreateTODO` JSON body
+### Example `Create TODO` JSON body
 
 > `completed` and `userId` are optional. Defaults: `completed = false`, `userId = 1`
 
@@ -89,7 +90,7 @@ The API currently supports the following mock resource types:
   "userId": 1
 }
 ```
-### Example `UpdateTODO` JSON body
+### Example `Update TODO` JSON body
 
 > `completed` and `userId` are optional. Defaults: `completed = false`, `userId = 1`
 
@@ -98,4 +99,77 @@ The API currently supports the following mock resource types:
   "todo": "Update README",
   "completed": true
 }
+```
+---
+### QUOTE Items
+| Endpoint                                       | Method | Description                          |
+|------------------------------------------------|--------|--------------------------------------|
+| `/quotes?limit=10&page=1&search=author:albert` | GET    | Fetch list of mocked QUOTE items     |
+| `/quotes/random`                               | GET    | Fetch a single random QUOTE item     |
+| `/quotes/random/list?limit=5`                  | GET    | Fetch an random array of QUOTE items |
+| `/quotes/{id}`                                 | GET    | Fetch a single QUOTE item by ID      |
+
+### Example `QUOTE` JSON
+
+```json
+  {
+      "id": 1,
+      "content": "The only way to do great work is to love what you do.",
+      "author": "Steve Jobs"
+  }
+```
+
+### Example `Paginated QUOTE` JSON
+> `queryparams` are optional. By default `limit == 100`,`page == 1`
+
+```json
+[
+  {
+    "quotes": [
+      {
+        "id": 1,
+        "content": "The only way to do great work is to love what you do.",
+        "author": "Steve Jobs"
+      },
+      {
+        "id": 2,
+        "content": "Success is not the key to happiness. Happiness is the key to success.",
+        "author": "Albert Schweitzer"
+      },
+      {
+        "id": 3,
+        "content": "In the middle of difficulty lies opportunity.",
+        "author": "Albert Einstein"
+      }
+    ],
+    "totalCount": 100,
+    "limit": 3,
+    "totalPages": 34,
+    "currentPage": 1,
+    "search": null,
+    "searchBy": null
+  }
+]
+```
+### Example `Random QUOTE Array` JSON
+> `queryparam` is optional. By default `limit == 10`
+
+```json
+[
+  {
+    "id": 68,
+    "content": "If you want something you’ve never had, you must be willing to do something you’ve never done.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 86,
+    "content": "Life is what happens when you’re busy making other plans.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 34,
+    "content": "The harder you work for something, the greater you’ll feel when you achieve it.",
+    "author": "Anonymous"
+  }
+]
 ```

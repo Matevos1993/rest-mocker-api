@@ -24,6 +24,7 @@ public interface QuoteMapper {
     paginatedQuote.setCurrentPage(page);
     paginatedQuote.setSearch(search);
     paginatedQuote.setSearchBy(searchBy);
+
     return paginatedQuote;
   }
 }

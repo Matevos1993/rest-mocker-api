@@ -3,6 +3,8 @@ package restmocker.backend.domain;
 import restmocker.backend.domain.dto.PaginatedQuote;
 import restmocker.backend.domain.dto.Quote;
 
+import java.util.List;
+
 public interface QuoteRepository {
 
   PaginatedQuote getPaginatedQuotes(int page, int limit, String search);
@@ -11,5 +13,5 @@ public interface QuoteRepository {
 
   Quote getRandomQuote();
 
-  Quote getRandomQuote(int limit);
+  List<Quote> getRandomQuote(int limit);
 }
