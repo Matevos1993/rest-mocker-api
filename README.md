@@ -23,6 +23,33 @@ This project is built with **[Quarkus](https://quarkus.io/)** – the Supersonic
 The API currently supports the following mock resource types:
 > ⚠️ **Warning:**  
 > Rest Mocker API simulates REST requests and responses. Default data is loaded from the database, while user changes are stored only in memory and are reset after 30 minutes. No actual data is permanently saved, updated, or deleted. All changes are ephemeral and exist only for the duration of the retention period.
+
+### HTTP Response
+
+| Endpoint                   | Method | Description                      |
+|----------------------------|--------|----------------------------------|
+| `/http/{status}`           | GET    | Mock HTTP Response               |
+| `/http/{status}/{message}` | GET    | Create your custom HTTP Response |
+
+### Example `Response body`
+
+```json
+{
+  "status": 200,
+  "message": "ok"
+}
+```
+
+### Example `Custom response body`
+> The status code must be between 100 and 599
+```json
+{
+  "status": 100,
+  "message": "Hello World!"
+}
+```
+---
+
 ### TODO Items
 
 | Endpoint                                              | Method | Description                                                 |
