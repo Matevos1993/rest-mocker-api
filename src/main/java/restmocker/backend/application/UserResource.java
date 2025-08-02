@@ -6,20 +6,17 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import restmocker.backend.application.dto.UserDto;
-import restmocker.backend.domain.RandomResourceGenerator;
-
-import java.util.UUID;
+import restmocker.backend.domain.UserGenerator;
 
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 @Path("/users")
 public class UserResource {
 
-  private final RandomResourceGenerator generator;
-  private final RandomResourceMapper mapper;
+  private final UserGenerator generator;
+  private final UserResourceMapper mapper;
 
   @Inject
-  public UserResource(RandomResourceGenerator generator, RandomResourceMapper mapper) {
+  public UserResource(UserGenerator generator, UserResourceMapper mapper) {
     this.generator = generator;
     this.mapper = mapper;
   }
@@ -28,20 +25,22 @@ public class UserResource {
   public Response getRandomUsers(@CookieParam("userId") String userId,
                                  @QueryParam("count") @DefaultValue("10") int count) {
 
+    NewCookie cookie = null;
+
     if (userId == null) {
-
-      userId = UUID.randomUUID().toString();
-      NewCookie cookie = CookieUtil.createUserIdCookie(userId);
+      CookieUtil.UserIdCookie userIdCookie = CookieUtil.generateNewUserIdAndCookie();
+      userId = userIdCookie.userId;
+      cookie = userIdCookie.cookie;
       generator.generateUsers(userId, count);
-
-      return Response.ok(mapper.mapToUserDtoList(generator.getUsers(userId)))
-          .cookie(cookie)
-          .build();
+    } else {
+      generator.generateUsers(userId, count);
     }
 
-    generator.generateUsers(userId, count);
+    Response.ResponseBuilder responseBuilder = Response.ok(mapper.mapToUserDtoList(generator.getUsers(userId)));
 
-    return Response.ok(mapper.mapToUserDtoList(generator.getUsers(userId))).build();
+    if (cookie != null) responseBuilder.cookie(cookie);
+
+    return responseBuilder.build();
   }
 
   @GET
@@ -49,23 +48,40 @@ public class UserResource {
   public Response getUserById(@PathParam("id") int id,
                               @CookieParam("userId") String userId) {
 
-    NewCookie cookie = null;
+    Response validation = validateRequest(userId, id);
 
-    if (userId == null) {
-      userId = UUID.randomUUID().toString();
-      cookie = CookieUtil.createUserIdCookie(userId);
-      generator.generateUsers(userId, id);
+    if (validation != null) return validation;
+
+    return Response.ok(mapper.mapToUserDto(generator.getUserById(id, userId))).build();
+  }
+
+  @PUT
+  @Path("/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updateUser(@PathParam("id") int id,
+                             @CookieParam("userId") String userId,
+                             UserDto user) {
+
+    Response validation = validateRequest(userId, id);
+
+    if (validation != null) return validation;
+
+    return Response.ok(mapper.mapToUserDto(generator.updateUser(userId, id, mapper.mapToUser(user)))).build();
+  }
+
+  private Response validateRequest(String userId, int id) {
+    if (!generator.isUserListValid(userId)) {
+
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("{\"error\": \"You must generate users first by calling /users.\"}")
+          .build();
+    } else if (!generator.isUserIdValid(userId, id)) {
+
+      return Response.status(Response.Status.NOT_FOUND)
+          .entity(String.format("{\"error\": \"User with id  %d not found.\"}", id))
+          .build();
     }
 
-    if (generator.getUsers(userId) == null || generator.getUsers(userId).isEmpty()) {
-      generator.generateUsers(userId, id);
-    }
-
-    UserDto userDto = mapper.mapToUserDto(generator.getUserById(id, userId));
-    Response.ResponseBuilder responseBuilder = Response.ok(userDto);
-    if (cookie != null) {
-      responseBuilder.cookie(cookie);
-    }
-    return responseBuilder.build();
+    return null;
   }
 }
