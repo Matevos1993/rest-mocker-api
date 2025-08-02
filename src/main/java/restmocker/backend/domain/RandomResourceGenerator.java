@@ -1,6 +1,7 @@
 package restmocker.backend.domain;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import restmocker.backend.domain.dto.Color;
 import restmocker.backend.domain.dto.User;
 
@@ -12,9 +13,15 @@ import java.util.*;
 @ApplicationScoped
 public class RandomResourceGenerator {
 
+  private final TodoRepository repository;
   private final Random random = new Random();
   private final Map<String, List<User>> userData = new HashMap<>();
   private final Map<String, LocalDateTime> lastGeneration = new HashMap<>();
+
+  @Inject
+  public RandomResourceGenerator(TodoRepository repository) {
+    this.repository = repository;
+  }
 
   public List<Color> generateColors(int count) {
 
@@ -22,8 +29,8 @@ public class RandomResourceGenerator {
 
     if (count < 1) {
       count = 1;
-    } else if (count > 100) {
-      count = 100;
+    } else if (count > 50) {
+      count = 50;
     }
 
     for (int i = 0; i < count; i++) {
@@ -114,7 +121,7 @@ public class RandomResourceGenerator {
         "Admin", "Moderator", "Editor", "Viewer", "Contributor", "Guest", "Member", "Super Admin", "Support Agent", "Developer", "Tester", "Manager"
     ));
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 1; i <= count; i++) {
 
       boolean isMale = userRandom.nextBoolean();
       String firstName = isMale ?
@@ -139,10 +146,9 @@ public class RandomResourceGenerator {
           String.format("%s.%s@example.com", firstName.toLowerCase(), surname.toLowerCase()),
           String.format("%s.%s", firstName.toLowerCase(), surname.toLowerCase()),
           String.format("%s%d", firstName.toLowerCase(), userRandom.nextInt(1000)),
-          roles.get(userRandom.nextInt(roles.size()))));
+          roles.get(userRandom.nextInt(roles.size())),
+          new ArrayList<>(repository.getTodosByUserId(i))));
     }
-
-    System.out.println(userId);
 
     userData.put(userId, users);
     lastGeneration.put(userId, now);
@@ -150,5 +156,9 @@ public class RandomResourceGenerator {
 
   public List<User> getUsers(String userId) {
     return userData.getOrDefault(userId, new ArrayList<>());
+  }
+
+  public User getUserById(int id, String userId) {
+    return userData.getOrDefault(userId, new ArrayList<>()).stream().filter(u -> u.getId() == id).findFirst().orElse(null);
   }
 }

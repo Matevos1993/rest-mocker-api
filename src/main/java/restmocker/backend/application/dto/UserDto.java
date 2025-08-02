@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +22,5 @@ public class UserDto {
   private String username;
   private String password;
   private String role;
+  private List<TodoDto> todos;
 }

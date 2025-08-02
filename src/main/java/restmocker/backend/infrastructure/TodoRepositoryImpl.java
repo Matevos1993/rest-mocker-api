@@ -8,13 +8,11 @@ import jakarta.ws.rs.NotFoundException;
 import restmocker.backend.domain.TodoRepository;
 import restmocker.backend.domain.dto.PaginatedTodos;
 import restmocker.backend.domain.dto.Todo;
+import restmocker.backend.domain.dto.User;
 import restmocker.backend.infrastructure.mapper.TodoMapper;
 import restmocker.backend.infrastructure.model.TodoModel;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @ApplicationScoped
@@ -116,6 +114,20 @@ public class TodoRepositoryImpl extends AbstractRepository implements TodoReposi
       TodoModel todo = findTodoById(id);
       todos.remove(todo);
     }
+  }
+
+  @Override
+  public List<Todo> getTodosByUserId(int userId) {
+
+    List<TodoModel> userTodos = entityManager.createQuery("""
+            select todo
+              from TodoModel todo
+             where todo.userId = :userId
+            """, TodoModel.class)
+        .setParameter("userId", userId)
+        .getResultList();
+
+    return mapper.mapToTodos(userTodos);
   }
 
   private TodoModel findTodoById(long id) {
