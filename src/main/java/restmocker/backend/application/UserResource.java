@@ -5,8 +5,11 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+import restmocker.backend.application.dto.TodoDto;
 import restmocker.backend.application.dto.UserDto;
 import restmocker.backend.domain.UserGenerator;
+
+import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/users")
@@ -14,11 +17,13 @@ public class UserResource {
 
   private final UserGenerator generator;
   private final UserResourceMapper mapper;
+  private final TodoMapper todoMapper;
 
   @Inject
-  public UserResource(UserGenerator generator, UserResourceMapper mapper) {
+  public UserResource(UserGenerator generator, UserResourceMapper mapper, TodoMapper todoMapper) {
     this.generator = generator;
     this.mapper = mapper;
+    this.todoMapper = todoMapper;
   }
 
   @GET
@@ -67,6 +72,48 @@ public class UserResource {
     if (validation != null) return validation;
 
     return Response.ok(mapper.mapToUserDto(generator.updateUser(userId, id, mapper.mapToUser(user)))).build();
+  }
+
+  @POST
+  @Path("/{id}/todos")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response addTodo(@PathParam("id") int id,
+                          @CookieParam("userId") String userId,
+                          TodoDto todo) {
+
+    Response validation = validateRequest(userId, id);
+
+    if (validation != null) return validation;
+
+    return Response.ok(mapper.mapToUserDto(generator.addTodo(userId, id, todoMapper.mapToTodo(todo)))).build();
+  }
+
+  @PUT
+  @Path("/{id}/todos/{todoId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updateUserTodo(@PathParam("id") int id,
+                                 @PathParam("todoId") int todoId,
+                                 @CookieParam("userId") String userId,
+                                 TodoDto todo) {
+
+    Response validation = validateRequest(userId, id);
+
+    if (validation != null) return validation;
+
+    return Response.ok(mapper.mapToUserDto(generator.updateTodo(userId, id, todoId, todoMapper.mapToTodo(todo)))).build();
+  }
+
+  @DELETE
+  @Path("/{id}/todos")
+  public void deleteTodos(@PathParam("id") int id,
+                          @QueryParam("todoId") List<Long> todoIds,
+                          @CookieParam("userId") String userId) {
+
+    Response validation = validateRequest(userId, id);
+
+    if (validation != null) return;
+
+    generator.deleteTodosById(userId, id, todoIds);
   }
 
   private Response validateRequest(String userId, int id) {

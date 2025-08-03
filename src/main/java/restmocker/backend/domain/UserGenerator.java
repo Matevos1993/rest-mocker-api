@@ -2,6 +2,8 @@ package restmocker.backend.domain;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.NotFoundException;
+import restmocker.backend.domain.dto.Todo;
 import restmocker.backend.domain.dto.User;
 
 import java.time.LocalDate;
@@ -146,7 +148,7 @@ public class UserGenerator {
     user.setFirstName(u.getFirstName() == null ? user.getFirstName() : u.getFirstName());
     user.setLastName(u.getLastName() == null ? user.getLastName() : u.getLastName());
     user.setGender(u.getGender() == null ? user.getGender() : u.getGender());
-    user.setDateOfBirth(u.getDateOfBirth() == null ?  user.getDateOfBirth() : u.getDateOfBirth());
+    user.setDateOfBirth(u.getDateOfBirth() == null ? user.getDateOfBirth() : u.getDateOfBirth());
     user.setAge(Period.between(user.getDateOfBirth(), LocalDate.now()).getYears());
     user.setEmail(u.getEmail() == null ? user.getEmail() : u.getEmail());
     user.setPassword(u.getPassword() == null ? user.getPassword() : u.getPassword());
@@ -155,7 +157,57 @@ public class UserGenerator {
     return user;
   }
 
-  public boolean isUserListValid(String userId) {return userId != null && getUsers(userId) != null && !getUsers(userId).isEmpty();}
+  public User updateTodo(String userId, int id, int todoId, Todo t) {
 
-  public boolean isUserIdValid(String userId, int id) {return isUserListValid(userId) && id <= getUsers(userId).size();}
+    User user = getUserById(id, userId);
+
+    Optional<Todo> todoOpt = user.getTodos().stream()
+        .filter(u -> u.getId() == todoId)
+        .findFirst();
+
+    if (todoOpt.isEmpty()) throw new NotFoundException("Todo with id " + todoId + " not found");
+
+    Todo todo = todoOpt.get();
+    todo.setCompleted(t.getCompleted() == null ? todo.getCompleted() : t.getCompleted());
+    todo.setTodo(t.getTodo() == null ? todo.getTodo() : t.getTodo());
+    todo.setUpdatedAt(new Date());
+    return user;
+  }
+
+  public User addTodo(String userId, int id, Todo todo) {
+
+    User user = getUserById(id, userId);
+
+    int maxId = Math.toIntExact(getUsers(userId).stream()
+        .flatMap(u -> u.getTodos().stream())
+        .mapToLong(Todo::getId)
+        .max()
+        .orElse(0));
+
+    todo.setUserId(user.getId());
+    todo.setCreatedAt(new Date());
+    todo.setId((long) maxId + 1);
+    todo.setCompleted(Boolean.TRUE.equals(todo.getCompleted()));
+
+    user.getTodos().add(todo);
+
+    return user;
+  }
+
+  public void deleteTodosById(String userId, int id, List<Long> todoIds) {
+
+    User user = getUserById(id, userId);
+
+    for (Long todoId : todoIds) {
+      user.getTodos().removeIf(u -> u.getId() == todoId);
+    }
+  }
+
+  public boolean isUserListValid(String userId) {
+    return userId != null && getUsers(userId) != null && !getUsers(userId).isEmpty();
+  }
+
+  public boolean isUserIdValid(String userId, int id) {
+    return isUserListValid(userId) && id <= getUsers(userId).size();
+  }
 }
