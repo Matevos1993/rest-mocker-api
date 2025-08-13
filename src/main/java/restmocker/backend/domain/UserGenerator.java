@@ -1,5 +1,6 @@
 package restmocker.backend.domain;
 
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
@@ -23,6 +24,13 @@ public class UserGenerator {
     this.repository = repository;
   }
 
+  @Scheduled(cron = "0 0 0 * * ?")
+  public void clearMemory() {
+
+    userData.clear();
+    lastGeneration.clear();
+  }
+
   public void generateUsers(String userId, int count) {
 
     Random userRandom = new Random(userId.hashCode());
@@ -30,7 +38,7 @@ public class UserGenerator {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime lastTime = lastGeneration.get(userId);
 
-    if (lastTime != null && lastTime.plusHours(2).isAfter(now) && count == userData.get(userId).size()) {
+    if (lastTime != null && lastTime.toLocalDate().isEqual(LocalDate.now()) && count == userData.get(userId).size()) {
       return;
     }
 
