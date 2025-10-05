@@ -3,6 +3,7 @@ package restmocker.backend.application;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import restmocker.backend.application.dto.AuthRequest;
+import restmocker.backend.application.dto.Token;
 import restmocker.backend.domain.AuthRepository;
 
 @ApplicationScoped
@@ -17,7 +18,7 @@ public class AuthService {
     this.authRepository = authRepository;
   }
 
-  public String login(String userId, AuthRequest request) {
-    return authRepository.authorizeUser(userId, authMapper.mapToAuthRequest(request));
+  public Token login(String userId, AuthRequest request) {
+    return authMapper.mapToToken(authRepository.authorizeUser(userId, authMapper.mapToAuthRequest(request)));
   }
 }

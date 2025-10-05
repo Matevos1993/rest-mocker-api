@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import restmocker.backend.application.dto.AuthRequest;
+import restmocker.backend.application.dto.Token;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -22,6 +23,7 @@ public class AuthResource {
   @POST
   @Path("/login")
   public Response login(@CookieParam("userId") String userId, AuthRequest request) {
-    return Response.ok(authService.login(userId, request)).build();
+    Token token = authService.login(userId, request);
+    return Response.ok(token).build();
   }
 }
