@@ -367,7 +367,7 @@ fetch('https://your-api-url/quotes/5')
   "firstName": "string",
   "lastName": "string",
   "gender": "string",
-  "dateOfBirth": "2022-03-10",
+  "dateOfBirth": "date",
   "email": "string",
   "password": "string",
   "role": "string"
@@ -459,3 +459,57 @@ fetch('https://your-api-url/users/1/todos?todoId=14,65', {method: 'DELETE'})
     .then(data => console.log(data));
 ```
 ---
+## Authorization
+
+After generating users, you can authorize them.
+
+To authorize:
+- Use the `userId` from your cookies and send it as a `CookieParam`.
+- Send the `username` and `password` in the request body.
+
+On successful authorization, you will receive a **Bearer token**.  
+Use this token in the `Authorization` header to make authenticated requests:
+
+| Endpoint                                                | Method | Description                   |
+|---------------------------------------------------------|--------|-------------------------------|
+| `/auth/login`                                           | POST   | send an authorization request |
+
+
+### Example `Token` JSON
+
+```json
+{
+  "token": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZW1haWwiOiJwcmVzdG9uLnBhcmtlckBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoicHJlc3Rvbi5wYXJrZXIiLCJleHBpcmVzSW4iOjE3NTk3MDE1OTkwMDB9.tp3mqyr4GuX16MSyN5c1JjmbCvakkPmHCy5PIJHBv14"
+}
+
+```
+
+### Token Structure
+> The token is a JWT.
+> It expires every day at 23:59:59.
+```json
+{
+  "id": "integer",
+  "username": "string",
+  "email": "string",
+  "expiresIn": "date"
+}
+```
+**URL:** `POST https://your-api-url/auth/login`
+
+```javascript
+fetch('https://your-api-url/auth/login', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Cookie': 'userId=1' // Replace with your actual userId from cookies
+    },
+    body: JSON.stringify({
+        username: 'preston.parker',
+        password: 'yourPasswordHere'
+    })
+})
+    .then(res => res.json())
+    .then(data => console.log('Token:', data))
+    .catch(err => console.error('Error:', err));
+```
